@@ -1,20 +1,29 @@
 version: 0.2
 
+env:
+  variables:
+    IMAGE_REPO_NAME: "demo-nginx"
+    AWS_REGION: "us-west-2"
+
 phases:
-  install:
+  pre_build:
     commands:
-      - echo "Nothing to install"
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin 246844015696.dkr.ecr.$AWS_REGION.amazonaws.com
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
   build:
     commands:
-      - echo "Preparing static files"
-      - ls -la
-      - pwd
-      - mkdir -p output
-      - rsync -av --exclude output ./ output/
-      - rm -rf output/output
+      - echo Building Docker image...
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG 246844015696.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Pushing Docker image to ECR...
+      - docker push 246844015696.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - printf '{"ImageURI":"%s"}' "246844015696.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG" > imageDetail.json
 
 artifacts:
   files:
-    - '**/*'
-  base-directory: output
+    - imageDetail.json
