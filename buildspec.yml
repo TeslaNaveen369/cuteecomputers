@@ -9,7 +9,8 @@ phases:
     commands:
       - echo "Preparing static files"
       - mkdir -p output
-      - cp * output/
+      - cp -r . output/
+      - rm -rf output/output
 
 artifacts:
   files:
