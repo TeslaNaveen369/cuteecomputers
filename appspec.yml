@@ -1,6 +1,8 @@
 version: 0.0
 os: linux
 
-files:
-  - source: /
-    destination: /var/www/html
+hooks:
+  ApplicationStart:
+    - location: scripts/run_docker.sh
+      timeout: 300
+      runas: root
