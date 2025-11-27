@@ -8,6 +8,7 @@ phases:
   build:
     commands:
       - echo "Preparing static files"
+      - ls -la
       - mkdir -p output
       - cp -r . output/
       - rm -rf output/output
