@@ -9,6 +9,7 @@ phases:
     commands:
       - echo "Preparing static files"
       - ls -la
+      - pwd
       - mkdir -p output
       - cp -r . output/
       - rm -rf output/output
